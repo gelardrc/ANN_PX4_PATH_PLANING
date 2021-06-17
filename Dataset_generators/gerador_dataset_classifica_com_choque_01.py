@@ -1,7 +1,7 @@
 # Nova rede_neural baseado na reunião 
 
 # Drone vai ter 6 opções de movimentação em um grid de 1
-#
+#  esquece isso que ta escrito
 #   Frente   - 0 0 0 0 0 0   x 
 #   Tras     - 0 1 0 0 0 0  -x
 #   Esquerda - 0 0 1 0 0 0   z
