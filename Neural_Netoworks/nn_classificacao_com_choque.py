@@ -7,17 +7,17 @@ from keras import models
 from keras import layers
 import tensorflow as tf
 
-dataset = pd.read_csv("dataset_classificador_com_choque_30000.csv")
+dataset = pd.read_csv("/home/gelo/codes/ANN_PX4_PATH_PLANING/DATASETS/a_dataset01.csv")
 print(dataset.shape)
-dataset_treino = dataset.iloc[0:10000,0:30]
-dataset_validacao = dataset.iloc[10000:20000,0:30]
-dataset_teste = dataset.iloc[20000:30000,0:30]
-x_train = dataset_treino.iloc[:,0:24]
-y_train = dataset_treino.iloc[:,24:30]
-x_val = dataset_validacao.iloc[:,0:24]
-y_val = dataset_validacao.iloc[:,24:30]
-x_teste = dataset_teste.iloc[:,0:24]
-y_teste = dataset_teste.iloc[:,24:30]
+dataset_treino = dataset.iloc[0:1000,0:30]
+dataset_validacao = dataset.iloc[1000:2000,0:30]
+dataset_teste = dataset.iloc[2000:3000,0:30]
+x_train = dataset_treino.iloc[:,0:12]
+y_train = dataset_treino.iloc[:,12:18]
+x_val = dataset_validacao.iloc[:,0:12]
+y_val = dataset_validacao.iloc[:,12:18]
+x_teste = dataset_teste.iloc[:,0:12]
+y_teste = dataset_teste.iloc[:,12:18]
 print(x_teste.shape) 
 print(y_teste)
 callback = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=5)
@@ -25,7 +25,7 @@ model = models.Sequential()
 model.add(layers.Dense(16,activation='sigmoid',input_shape=(x_train.shape[1],)))
 #model.add(layers.Dense(32,activation='relu'))
 model.add(layers.Dense(6,activation='softmax'))
-model.compile(optimizer = 'adam',
+model.compile(optimizer = 'RMS prop',
                 loss='categorical_crossentropy',
                 metrics = ['accuracy']
                 )
