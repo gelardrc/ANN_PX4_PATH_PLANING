@@ -118,13 +118,12 @@ class Parallelepiped:
 
     def draw(self, ax,):
 
-      poly = Poly3DCollection(self.vertixes(), linewidths=1)
-      
-      poly.set_alpha(0.5)
-      poly.set_facecolor('k') 
-      
-      #poly.set_edgecolor('k')
-      ax.add_collection3d(poly)
+        poly = Poly3DCollection(self.vertixes(), linewidths=4)  
+        poly.set_alpha(0.05)
+        poly.set_facecolor('k') 
+        poly.set_edgecolor('b')
+        ax.add_collection3d(poly)
+
         
 ### Obstacles ###
 def add_obstacle(obstacles, pose, dim):
@@ -155,7 +154,7 @@ def entrada(estou,alvo,sensor):
 
 def choque(onde_estou,obstacles):
     
-    #### aqui verifica se a direção escolhida esta ocupada ###
+    #aqui verifica se a direcao escolhida esta ocupada
     grid = 1
     cont = 0
     choqui = [0,0,0,0,0,0]
@@ -164,7 +163,7 @@ def choque(onde_estou,obstacles):
         bateu = isCollisionFreeVertex(obstacles,onde_estou+i)
         #bateu = isCollisionFreeEdge(obstacles,onde_estou+i,onde_estou)
         
-        # BAteu é zero quando tem choque !!
+        # BAteu e zero quando tem choque !!
         if bateu == 0:
             choqui[cont] = 1
             cont = cont+1
@@ -259,8 +258,8 @@ def dynamic(ax):
 
 kidnapped_rtt = False
 kidnapped_neural = False
-neural = False
-rtt_logic = True   
+neural = True
+rtt_logic = False   
 dinamico =  False
 
 cont = 0
@@ -269,7 +268,8 @@ sol=True
 fim=True
 
 if neural:
-    model = load_model('/home/gelo/codes/ANN_PX4_PATH_PLANING/Redes_salvas/dritk.h5')
+    #model = load_model('/home/gelo/codes/ANN_PX4_PATH_PLANING/Redes_salvas/dritk.h5')
+    model = load_model('/home/gelo/codes/ANN_PX4_PATH_PLANING/Redes_salvas/python2.h5')
 
 #################################
 
@@ -379,7 +379,7 @@ while neural or rtt_logic:
             dinamico = False
         
         if kidnapped_neural == True and cont == 10:
-            ## Coloca o robo em um ponto aleátorio
+            ## Coloca o robo em um ponto aleatorio
             #start = np.array([randint(-4,4),randint(-4,4),randint(-4,4)])
             start = sequestro_rtt
             ax1.scatter3D(start[0], start[1], start[2], color='green', s=100)
@@ -392,31 +392,59 @@ while neural or rtt_logic:
                 start = np.array([0,0,0])
                 primeiro = False
             
-            #sensors = choque(start,obstacles)
+            start_velho = start
+            starti = start
+            s0, s1, s2, s3, s4, s5 = sensors(start)
+            sensores = np.array([s0, s1, s2, s3, s4, s5])
 
-            s0,s1,s2,s3,s4,s5 = sensors(start)
-            
-            sensores = np.array([s0,s1,s2,s3,s4,s5])
+            input = entrada(start, stop, sensores)
 
-            input = entrada(start,goal,sensores)
+            # print(input)
 
             out = model.predict(input)
 
-            new_start = direcao(out,start)
+            acao, start_futuro = action(out, start, repitido=False)
 
-            #print('start -->'); print(new_start)
+            start_futuro_list = list(start_futuro)
 
-            ax1.plot([start[0],new_start[0]],[start[1],new_start[1]],[start[2],new_start[2]],color ='red',linewidth=2)
+            while start_futuro_list in openlist:
+            
+                acao, start_futuro = action(out, start, repitido=True)
 
-            start = new_start
+                start_futuro_list = list(start_futuro)
+
+            #ax.plot([start[0],start_futuro[0]],[start[1],start_futuro[1]],[start[2],start_futuro[2]],color = 'r',linewidth =2 )
+            plt.pause(0.01)
+
+            start = start_futuro
+            #print(start)
+            openlist.append(list(start))
+            
+            #sensors = choque(start,obstacles)
+
+            #s0,s1,s2,s3,s4,s5 = sensors(start)
+            #
+            #sensores = np.array([s0,s1,s2,s3,s4,s5])
+#
+            #input = entrada(start,goal,sensores)
+#
+            #out = model.predict(input)
+#
+            #new_start = direcao(out,start)
+#
+            ##print('start -->'); print(new_start)
+#
+            #ax1.plot([start[0],new_start[0]],[start[1],new_start[1]],[start[2],new_start[2]],color ='red',linewidth=2)
+#
+            #start = new_start
 
             passos+=0.5
             plt.pause(0.01)
         else:
             neural = False
             final_rede = time.time()
-            print("Rede neural encontro a solução em -->");print(final_rede - start_time)
-            print("Distância percorrida até o alvo -->");print(passos)
+            print("Rede neural encontro a solucao em -->");print(final_rede - start_time)
+            print("Distancia percorrida ate o alvo -->");print(passos)
         cont+=1    
     
     

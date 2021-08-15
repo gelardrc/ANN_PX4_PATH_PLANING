@@ -9,8 +9,8 @@ from sensor_msgs.msg import LaserScan
 import numpy as np
 import tensorflow as tf
 
-from keras.models import load_model
-
+#from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 
 # callback method for state sub
@@ -32,7 +32,7 @@ mission = PoseStamped()
 
 missao = Point()
 
-model = load_model('/media/gelo/FC86-E677/notebook_backup/Area_de_Trabalho/novo_projeto/MAVROS/binho.h5')
+model = load_model('/home/gelo/codes/ANN_PX4_PATH_PLANING/Redes_salvas/dritk_qualificacao.h5')
 
 
 def state_cb(state):
@@ -178,6 +178,7 @@ missao = PoseStamped()
 pose.pose.position.x = 0
 pose.pose.position.y = 0
 pose.pose.position.z = 2
+
 
 def position_control():
     rospy.init_node('offb_node', anonymous=True)
