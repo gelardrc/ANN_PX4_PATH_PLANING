@@ -10,6 +10,7 @@ import numpy as np
 import tensorflow as tf
 from keras import models
 from keras import layers
+import time
 
 from keras.models import load_model
 #from tensorflow.keras.models import load_model
@@ -34,7 +35,10 @@ mission = PoseStamped()
 
 missao = Point()
 
-model = load_model('/home/gelo/codes/ANN_PX4_PATH_PLANING/Redes_salvas/dritk_qualificacao.h5')
+caminho_rede = '/home/gelo/codes/ANN_PX4_PATH_PLANING/Redes_salvas/dijstrk_sem_obj.h5'
+
+model = load_model(caminho_rede)
+
 #model = load_model('/home/gelo/codes/ANN_PX4_PATH_PLANING/binho.h5')
 
 
@@ -133,11 +137,11 @@ def acao(output):
     if acao ==0:
         mission.pose.position.x =poses.x + 0
         mission.pose.position.y =poses.y + 0
-        mission.pose.position.z =poses.z + 1 
+        mission.pose.position.z =poses.z + 2 
     if acao ==1:
         mission.pose.position.x =poses.x + 0 
         mission.pose.position.y =poses.y + 0
-        mission.pose.position.z =poses.z - 1 
+        mission.pose.position.z =poses.z - 1
     if acao ==2:
         mission.pose.position.x =poses.x + 0
         mission.pose.position.y =poses.y + 1
@@ -180,6 +184,10 @@ pose = PoseStamped()
 
 missao = PoseStamped()
 
+decolar = PoseStamped()
+
+stay = PoseStamped()
+
 pose.pose.position.x = 0
 
 pose.pose.position.y = 0
@@ -190,6 +198,8 @@ pose.pose.position.z = 2
 onde_estou_ = PoseStamped()
 
 def position_control():
+    decolou = False
+    cheguei = False
     rospy.init_node('offb_node', anonymous=True)
     prev_state = current_state
     rate = rospy.Rate(20.0) # MUST be more then 2Hz
@@ -226,24 +236,54 @@ def position_control():
         
         ranges= [ lidar0,lidar1,lidar2,lidar3,lidar4,lidar5 ]
         #print('ranges :',ranges)
+        ranges = [0,0,0,0,0,0]
         choqui = choque(ranges)
         
         poses.x = round(poses.x)
         poses.y = round(poses.y)
         poses.z = round(poses.z)
 
-        input = entrada(poses,[5,5,5],choqui)
-
-        #print('entrada :',input)
-        output = model.predict(input)
-        #print(output)
-        missao = acao(output)
-        #print(missao)
-        missao.header.stamp = rospy.Time.now()
-        print('posicao -->',poses)
-        if poses.x != 5 or poses.y != 5 or poses.z != 5:
-            local_pos_pub.publish(missao)
+        if not decolou:
+            decolar.pose.position.x = 0;decolar.pose.position.y = 0;decolar.pose.position.z = 5;decolar.header.stamp =  rospy.Time.now()
+            local_pos_pub.publish(decolar)
             rate.sleep()
+            if poses.z > 4:
+                decolou = True
+        else : 
+            input = entrada(poses,[33,21,4],choqui)
+
+            #print('entrada :',input)
+            output = model.predict(input)
+            #print(output)
+            missao = acao(output)
+            #print(missao)
+            missao.header.stamp = rospy.Time.now()
+            print('posicao -->',poses)
+            
+            if poses.x <= 34 and poses.x >= 32 and poses.y <= 22 and poses.y >= 20 and poses.z <= 5 and poses.z >= 3: 
+                if not cheguei:
+                    stay.pose.position.x = poses.x
+                    stay.pose.position.y = poses.y
+                    stay.pose.position.z = poses.z
+                stay.header.stamp = rospy.Time.now()
+                local_pos_pub.publish(stay)
+
+                cheguei = True
+
+                #for i in range(10):
+
+                    #decolar.pose.position.x = poses.x;decolar.pose.position.y= poses.y;decolar.pose.position.z = poses.z;decolar.header.stamp =  rospy.Time.now()
+                    #local_pos_pub.publish(decolar)
+
+            if not cheguei:
+                time.sleep(0.2)
+                local_pos_pub.publish(missao)
+                rate.sleep()
+            
+            
+                
+
+            
         
 
 if __name__ == '__main__':
