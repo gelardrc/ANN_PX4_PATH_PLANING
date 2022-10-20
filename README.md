@@ -1,4 +1,4 @@
-#Dynamic Path Planning Based on Neural Networks for Aerial Inspection
+## Dynamic Path Planning Based on Neural Networks for Aerial Inspection
 
 This repository represents the codes applied to generate all the data in the article : [Dynamic Path Planning Based on Neural Networks for Aerial Inspection](https://link.springer.com/article/10.1007/s40313-022-00941-y)
 
