@@ -10,5 +10,5 @@ Fell free to play with the codes and create new simulations or to compare with o
 
 The simulations were generated using PX4-ROS/Kinect package and gazebo7.
 
-# Installations
+### Installations
 
