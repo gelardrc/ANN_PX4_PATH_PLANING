@@ -1,2 +1,8 @@
-# ANN_PX4_PATH_PLANING
-Aply neural networks to tackle the problem of path planning in a 3d wild enviroment, using a px4 based drone.
+#Dynamic Path Planning Based on Neural Networks for Aerial Inspection
+
+This repository represents the codes applied to generate all the data in the article : [Dynamic Path Planning Based on Neural Networks for Aerial Inspection](https://link.springer.com/article/10.1007/s40313-022-00941-y)
+
+Fell free to play with the codes and create new situations.
+
+The simulations were generated using PX4-ROS/Kinect package and gazebo7.
+
